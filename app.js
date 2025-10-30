@@ -21,6 +21,14 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    status: "error",
+    code: err.status || 500,
+    message: err.message || "Server error",
+  });
+});
+
 app.listen(3000, () => {
   console.log("Server is running. Use our API on port: 3000");
 });
