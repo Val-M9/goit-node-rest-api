@@ -13,7 +13,7 @@ export const getAllContacts = async (req, res) => {
   return res.json({
     status: "success",
     code: 200,
-    data: { contacts },
+    data: contacts,
   });
 };
 
@@ -27,7 +27,7 @@ export const getOneContact = async (req, res, next) => {
   return res.json({
     status: "success",
     code: 200,
-    data: { contact },
+    data: contact,
   });
 };
 
@@ -41,7 +41,7 @@ export const deleteContact = async (req, res, next) => {
   return res.json({
     status: "success",
     code: 200,
-    data: { deletedContact },
+    data: deletedContact,
   });
 };
 
@@ -52,7 +52,7 @@ export const createContact = async (req, res) => {
   return res.status(201).json({
     status: "success",
     code: 201,
-    data: { newContact },
+    data: newContact,
   });
 };
 
@@ -68,6 +68,6 @@ export const updateContact = async (req, res, next) => {
   return res.json({
     status: "success",
     code: 200,
-    data: { updatedContact },
+    data: updatedContact,
   });
 };
