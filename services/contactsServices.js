@@ -1,87 +1,68 @@
-import fs from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const contactsPath = path.join(__dirname, "../db/contacts.json");
+import { Contact } from "../db/contactModel.js";
 
 async function listContacts() {
   try {
-    const contactsData = await fs.readFile(contactsPath, "utf-8");
-
-    return JSON.parse(contactsData);
+    const contacts = await Contact.findAll();
+    return contacts;
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error("Error fetching contacts: ", error);
   }
 }
 
 async function getContactById(contactId) {
   try {
-    const contactsData = await fs.readFile(contactsPath, "utf-8");
-    const contacts = JSON.parse(contactsData);
-
-    return contacts.find((contact) => contact.id === contactId) || null;
+    const contact = await Contact.findByPk(contactId);
+    return contact;
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error("Error fetching contact: ", error);
   }
 }
 
 async function removeContact(contactId) {
   try {
-    const contactsData = await fs.readFile(contactsPath, "utf-8");
-    const contacts = JSON.parse(contactsData);
-    const contactToDeleteIdx = contacts.findIndex(
-      (contact) => contact.id === contactId
-    );
-    if (contactToDeleteIdx === -1) return null;
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) return null;
 
-    const deletedContact = contacts[contactToDeleteIdx];
-    const updatedContacts = contacts.filter(
-      (contact) => contact.id !== contactId
-    );
-    await fs.writeFile(contactsPath, JSON.stringify(updatedContacts, null, 2));
-
-    return deletedContact;
+    await contact.destroy();
+    return contact;
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error("Error removing contact: ", error);
   }
 }
 
-async function addContact(name, email, phone) {
+async function addContact(name, email, phone, favorite = false) {
   try {
-    const newContact = {
-      id: randomUUID(),
-      name,
-      email,
-      phone,
-    };
-    const contactsData = await fs.readFile(contactsPath, "utf-8");
-    const contacts = JSON.parse(contactsData);
-    contacts.push(newContact);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    const newContact = await Contact.create({ name, email, phone, favorite });
+    console.log("NEW CONTACT", newContact);
 
     return newContact;
   } catch (error) {
-    console.error("Error adding contact:", error);
+    console.error("Error adding contact: ", error);
   }
 }
 
-async function renewContact(id, data) {
+async function updateContact(contactId, data) {
   try {
-    const contactsData = await fs.readFile(contactsPath, "utf-8");
-    const contacts = JSON.parse(contactsData);
-    const contactIndex = contacts.findIndex((contact) => contact.id === id);
-    if (contactIndex === -1) return null;
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) return null;
 
-    contacts[contactIndex] = { ...contacts[contactIndex], ...data };
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-    return contacts[contactIndex];
+    await contact.update(data);
+    return contact;
   } catch (error) {
-    console.error("Error updating contact:", error);
+    console.error("Error updating contact: ", error);
+  }
+}
+
+async function updateStatusContact(contactId, body) {
+  try {
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) return null;
+
+    contact.favorite = body.favorite;
+    await contact.save();
+    return contact;
+  } catch (error) {
+    console.error("Error updating favorite status: ", error);
   }
 }
 
@@ -90,5 +71,6 @@ export {
   getContactById,
   removeContact,
   addContact,
-  renewContact,
+  updateContact,
+  updateStatusContact,
 };
