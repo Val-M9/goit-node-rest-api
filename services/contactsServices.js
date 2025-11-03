@@ -6,6 +6,7 @@ async function listContacts() {
     return contacts;
   } catch (error) {
     console.error("Error fetching contacts: ", error);
+    throw error;
   }
 }
 
@@ -15,6 +16,7 @@ async function getContactById(contactId) {
     return contact;
   } catch (error) {
     console.error("Error fetching contact: ", error);
+    throw error;
   }
 }
 
@@ -27,17 +29,18 @@ async function removeContact(contactId) {
     return contact;
   } catch (error) {
     console.error("Error removing contact: ", error);
+    throw error;
   }
 }
 
 async function addContact(name, email, phone, favorite = false) {
   try {
     const newContact = await Contact.create({ name, email, phone, favorite });
-    console.log("NEW CONTACT", newContact);
 
     return newContact;
   } catch (error) {
     console.error("Error adding contact: ", error);
+    throw error;
   }
 }
 
@@ -50,6 +53,7 @@ async function updateContact(contactId, data) {
     return contact;
   } catch (error) {
     console.error("Error updating contact: ", error);
+    throw error;
   }
 }
 
@@ -63,6 +67,7 @@ async function updateStatusContact(contactId, body) {
     return contact;
   } catch (error) {
     console.error("Error updating favorite status: ", error);
+    throw error;
   }
 }
 
