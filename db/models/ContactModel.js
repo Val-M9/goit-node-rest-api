@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "./dbConnect.js";
+import { sequelize } from "../sequelize.js";
 
 export const Contact = sequelize.define(
   "contact",
@@ -26,8 +26,14 @@ export const Contact = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    owner: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     timestamps: false,
   }
 );
+
+Contact.sync();

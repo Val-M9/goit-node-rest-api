@@ -1,4 +1,4 @@
-import { Contact } from "../db/contactModel.js";
+import { Contact } from "../db/models/ContactModel.js";
 
 async function listContacts() {
   try {
