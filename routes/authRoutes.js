@@ -1,13 +1,10 @@
 import express from "express";
+import validateBody from "../helpers/validateBody.js";
+import { createUserSchema } from "../schemas/authSchemas.js";
+import { registerUser } from "../controllers/authControllers.js";
 
 const authRouter = express.Router();
 
-// Temporary placeholder handler to avoid startup errors when route
-// implementation is not yet provided. Replace with your real
-// controller (e.g. import { register } from '../controllers/authController.js')
-// when available.
-authRouter.post("/register", async (req, res) => {
-  return res.status(501).json({ message: "Not implemented" });
-});
+authRouter.post("/register", validateBody(createUserSchema), registerUser);
 
 export default authRouter;

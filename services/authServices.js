@@ -1,5 +1,7 @@
+import bcrypt from "bcrypt";
 import { User } from "../db/models/UserModel.js";
 
-async function register(password, email) {
-  const createUser = await User.create();
+export async function register(payload) {
+  const hashPassword = await bcrypt.hash(payload.password, 10);
+  return await User.create({ ...payload, password: hashPassword });
 }

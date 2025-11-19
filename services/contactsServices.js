@@ -1,6 +1,6 @@
 import { Contact } from "../db/models/ContactModel.js";
 
-async function listContacts() {
+export async function listContacts() {
   try {
     const contacts = await Contact.findAll();
     return contacts;
@@ -10,7 +10,7 @@ async function listContacts() {
   }
 }
 
-async function getContactById(contactId) {
+export async function getContactById(contactId) {
   try {
     const contact = await Contact.findByPk(contactId);
     return contact;
@@ -20,7 +20,7 @@ async function getContactById(contactId) {
   }
 }
 
-async function removeContact(contactId) {
+export async function removeContact(contactId) {
   try {
     const contact = await Contact.findByPk(contactId);
     if (!contact) return null;
@@ -33,7 +33,7 @@ async function removeContact(contactId) {
   }
 }
 
-async function addContact(name, email, phone, favorite = false) {
+export async function addContact(name, email, phone, favorite = false) {
   try {
     const newContact = await Contact.create({ name, email, phone, favorite });
 
@@ -44,7 +44,7 @@ async function addContact(name, email, phone, favorite = false) {
   }
 }
 
-async function updateContact(contactId, data) {
+export async function updateContact(contactId, data) {
   try {
     const contact = await Contact.findByPk(contactId);
     if (!contact) return null;
@@ -57,7 +57,7 @@ async function updateContact(contactId, data) {
   }
 }
 
-async function updateStatusContact(contactId, body) {
+export async function updateStatusContact(contactId, body) {
   try {
     const contact = await Contact.findByPk(contactId);
     if (!contact) return null;
@@ -70,12 +70,3 @@ async function updateStatusContact(contactId, body) {
     throw error;
   }
 }
-
-export {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
-};

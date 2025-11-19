@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../sequelize.js";
+import { subscriptionTypes } from "../../constants/userSettings.js";
 
 export const User = sequelize.define("user", {
   id: {
@@ -15,12 +16,15 @@ export const User = sequelize.define("user", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: {
+      args: true,
+      msg: "Email already in use!",
+    },
   },
   subscription: {
     type: DataTypes.ENUM,
-    values: ["starter", "pro", "business"],
-    defaultValue: "starter",
+    values: subscriptionTypes,
+    defaultValue: subscriptionTypes[0],
   },
   token: {
     type: DataTypes.STRING,

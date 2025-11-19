@@ -7,7 +7,6 @@ import {
   updateContactData,
   updateFavorite,
 } from "../controllers/contactsControllers.js";
-
 import validateBody from "../helpers/validateBody.js";
 import {
   createContactSchema,
