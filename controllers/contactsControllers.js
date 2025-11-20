@@ -1,120 +1,123 @@
-import {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
-} from "../services/contactsServices.js";
+import * as contactsService from "../services/contactsServices.js";
 
 import HttpError from "../helpers/HttpError.js";
 
-export const getAllContacts = async (req, res, next) => {
-  try {
-    const contacts = await listContacts();
-    return res.json({
-      status: "success",
-      code: 200,
-      data: contacts,
-    });
-  } catch (error) {
-    next(error);
+export const getAllContacts = async (req, res) => {
+  const { id: owner } = req.user;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const offset = (page - 1) * limit;
+  const favoriteFilter = req.query.favorite;
+
+  if (favoriteFilter && !["true", "false"].includes(favoriteFilter)) {
+    return res
+      .status(400)
+      .json({ message: "Favorite value must be 'true' or 'false'" });
   }
+
+  const contacts = await contactsService.listContacts({
+    owner,
+    limit,
+    offset,
+    favorite: favoriteFilter,
+  });
+
+  return res.json({
+    status: "success",
+    code: 200,
+    data: contacts,
+  });
 };
 
 export const getOneContact = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const contact = await getContactById(id);
-    if (!contact) {
-      return next(HttpError(404));
-    }
+  const { id } = req.params;
+  const { id: owner } = req.user;
 
-    return res.json({
-      status: "success",
-      code: 200,
-      data: contact,
-    });
-  } catch (error) {
-    next(error);
+  const contact = await contactsService.getContactById({ id, owner });
+  if (!contact) {
+    return next(HttpError(404));
   }
+
+  return res.json({
+    status: "success",
+    code: 200,
+    data: contact,
+  });
 };
 
 export const deleteContact = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const deletedContact = await removeContact(id);
-    if (!deletedContact) {
-      return next(HttpError(404));
-    }
+  const { id } = req.params;
+  const { id: owner } = req.user;
 
-    return res.json({
-      status: "success",
-      code: 200,
-      data: deletedContact,
-    });
-  } catch (error) {
-    next(error);
+  const deletedContact = await contactsService.removeContact({ id, owner });
+  if (!deletedContact) {
+    return next(HttpError(404));
   }
+
+  return res.json({
+    status: "success",
+    code: 200,
+    data: deletedContact,
+  });
 };
 
-export const createContact = async (req, res, next) => {
-  try {
-    const { name, email, phone, favorite } = req.body;
-    const newContact = await addContact(name, email, phone, favorite);
+export const createContact = async (req, res) => {
+  const { id: owner } = req.user;
+  console.log("Owner", owner);
 
-    return res.status(201).json({
-      status: "success",
-      code: 201,
-      data: newContact,
-    });
-  } catch (error) {
-    next(error);
-  }
+  const newContact = await contactsService.addContact({ ...req.body, owner });
+
+  return res.status(201).json({
+    status: "success",
+    code: 201,
+    data: newContact,
+  });
 };
 
 export const updateContactData = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const updatedData = req.body;
+  const { id } = req.params;
+  const { id: owner } = req.user;
 
-    const updatedContact = await updateContact(id, updatedData);
-    if (!updatedContact) {
-      return next(HttpError(404));
-    }
+  const updatedData = req.body;
 
-    return res.json({
-      status: "success",
-      code: 200,
-      data: updatedContact,
-    });
-  } catch (error) {
-    next(error);
+  const updatedContact = await contactsService.updateContact(
+    { id, owner },
+    updatedData
+  );
+  if (!updatedContact) {
+    return next(HttpError(404));
   }
+
+  return res.json({
+    status: "success",
+    code: 200,
+    data: updatedContact,
+  });
 };
 
 export const updateFavorite = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const body = req.body;
-    const contact = await getContactById(id);
+  const { id } = req.params;
+  const { id: owner } = req.user;
 
-    if (!contact) return next(HttpError(404));
+  const body = req.body;
+  const contact = await contactsService.getContactById({ id, owner });
 
-    if (contact.favorite === body.favorite) {
-      const message = body.favorite
-        ? "Contact is already in favorite"
-        : "Contact is not in favorite already";
-      return next(HttpError(409, message));
-    }
+  if (!contact) return next(HttpError(404));
 
-    const updatedContact = await updateStatusContact(id, body);
-    return res.json({
-      status: "success",
-      code: 200,
-      data: updatedContact,
-    });
-  } catch (error) {
-    next(error);
+  if (contact.favorite === body.favorite) {
+    const message = body.favorite
+      ? "Contact is already in favorite"
+      : "Contact is not in favorite already";
+    return next(HttpError(409, message));
   }
+
+  const updatedContact = await contactsService.updateStatusContact(
+    { id, owner },
+    body
+  );
+  return res.json({
+    status: "success",
+    code: 200,
+    data: updatedContact,
+  });
 };

@@ -1,28 +1,39 @@
-import { Contact } from "../db/contactModel.js";
+import { Contact } from "../db/models/ContactModel.js";
 
-async function listContacts() {
+export const listContacts = async ({ owner, limit, offset, favorite }) => {
   try {
-    const contacts = await Contact.findAll();
+    const whereClause = { owner };
+    if (favorite !== undefined) {
+      if (favorite === "true") whereClause.favorite = true;
+      else if (favorite === "false") whereClause.favorite = false;
+    }
+
+    const contacts = await Contact.findAll({
+      where: whereClause,
+      limit,
+      offset,
+    });
+
     return contacts;
   } catch (error) {
     console.error("Error fetching contacts: ", error);
     throw error;
   }
-}
+};
 
-async function getContactById(contactId) {
+export const getContactById = async (query) => {
   try {
-    const contact = await Contact.findByPk(contactId);
+    const contact = await Contact.findOne({ where: query });
     return contact;
   } catch (error) {
     console.error("Error fetching contact: ", error);
     throw error;
   }
-}
+};
 
-async function removeContact(contactId) {
+export const removeContact = async (query) => {
   try {
-    const contact = await Contact.findByPk(contactId);
+    const contact = await Contact.findOne({ where: query });
     if (!contact) return null;
 
     await contact.destroy();
@@ -31,22 +42,22 @@ async function removeContact(contactId) {
     console.error("Error removing contact: ", error);
     throw error;
   }
-}
+};
 
-async function addContact(name, email, phone, favorite = false) {
+export const addContact = async (payload) => {
   try {
-    const newContact = await Contact.create({ name, email, phone, favorite });
+    const newContact = await Contact.create(payload);
 
     return newContact;
   } catch (error) {
     console.error("Error adding contact: ", error);
     throw error;
   }
-}
+};
 
-async function updateContact(contactId, data) {
+export const updateContact = async (query, data) => {
   try {
-    const contact = await Contact.findByPk(contactId);
+    const contact = await getContactById(query);
     if (!contact) return null;
 
     await contact.update(data);
@@ -55,11 +66,11 @@ async function updateContact(contactId, data) {
     console.error("Error updating contact: ", error);
     throw error;
   }
-}
+};
 
-async function updateStatusContact(contactId, body) {
+export const updateStatusContact = async (query, body) => {
   try {
-    const contact = await Contact.findByPk(contactId);
+    const contact = await getContactById(query);
     if (!contact) return null;
 
     contact.favorite = body.favorite;
@@ -69,13 +80,4 @@ async function updateStatusContact(contactId, body) {
     console.error("Error updating favorite status: ", error);
     throw error;
   }
-}
-
-export {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
 };
