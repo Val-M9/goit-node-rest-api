@@ -1,8 +1,19 @@
 import { Contact } from "../db/models/ContactModel.js";
 
-export const listContacts = async (owner) => {
+export const listContacts = async ({ owner, limit, offset, favorite }) => {
   try {
-    const contacts = await Contact.findAll({ where: owner });
+    const whereClause = { owner };
+    if (favorite !== undefined) {
+      if (favorite === "true") whereClause.favorite = true;
+      else if (favorite === "false") whereClause.favorite = false;
+    }
+
+    const contacts = await Contact.findAll({
+      where: whereClause,
+      limit,
+      offset,
+    });
+
     return contacts;
   } catch (error) {
     console.error("Error fetching contacts: ", error);

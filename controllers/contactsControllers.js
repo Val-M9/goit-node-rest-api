@@ -4,7 +4,24 @@ import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res) => {
   const { id: owner } = req.user;
-  const contacts = await contactsService.listContacts({ owner });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const offset = (page - 1) * limit;
+  const favoriteFilter = req.query.favorite;
+
+  if (favoriteFilter && !["true", "false"].includes(favoriteFilter)) {
+    return res
+      .status(400)
+      .json({ message: "Favorite value must be 'true' or 'false'" });
+  }
+
+  const contacts = await contactsService.listContacts({
+    owner,
+    limit,
+    offset,
+    favorite: favoriteFilter,
+  });
+
   return res.json({
     status: "success",
     code: 200,
