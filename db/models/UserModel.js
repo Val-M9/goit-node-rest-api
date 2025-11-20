@@ -25,11 +25,15 @@ export const User = sequelize.define("user", {
     type: DataTypes.ENUM,
     values: subscriptionTypes,
     defaultValue: subscriptionTypes[0],
+    validate: {
+      isIn: {
+        args: [subscriptionTypes],
+        msg: "Subscription must be one of: starter, pro, business",
+      },
+    },
   },
   token: {
     type: DataTypes.STRING,
     defaultValue: null,
   },
 });
-
-User.sync();
