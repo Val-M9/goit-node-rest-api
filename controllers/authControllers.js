@@ -46,6 +46,16 @@ export const updateUserSubscription = async (req, res) => {
   });
 };
 
+export const updateUserAvatar = async (req, res) => {
+  const avatarURL = await authService.updateUserAvatar(req.user, req.file);
+
+  return res.json({
+    status: "success",
+    code: 200,
+    avatarURL,
+  });
+};
+
 export const logoutUser = async (req, res) => {
   await authService.logoutUser(req.user);
 

@@ -32,6 +32,7 @@ export const User = sequelize.define("user", {
       },
     },
   },
+  avatarURL: DataTypes.STRING,
   token: {
     type: DataTypes.STRING,
     defaultValue: null,
