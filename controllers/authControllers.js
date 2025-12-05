@@ -12,6 +12,25 @@ export const registerUser = async (req, res) => {
   });
 };
 
+export const verifyUserEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  await authService.verifyUserEmail(verificationToken);
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Verification successful",
+  });
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  await authService.resendVerificationEmail(req.body);
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Verification email sent",
+  });
+};
+
 export const loginUser = async (req, res) => {
   const result = await authService.loginUser(req.body);
   return res.status(200).json({
