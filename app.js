@@ -4,6 +4,7 @@ import cors from "cors";
 import "dotenv/config";
 
 import { dbConnect } from "./db/dbConnect.js";
+import { verifyTransport } from "./helpers/email/sendEmail.js";
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRoutes.js";
 import { notFoundHandler } from "./middlewares/notFoundHandler.js";
@@ -31,6 +32,16 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 await dbConnect();
+
+// Verify SMTP transport
+try {
+  await verifyTransport();
+} catch (err) {
+  console.error(
+    `Warning: SMTP transport verify failed at startup. Email may not work: 
+    ${err && err.code} ${err && err.message}`
+  );
+}
 
 const port = process.env.PORT || 3000;
 
